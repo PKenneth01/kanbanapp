@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React from "react";
 
 export default function Home() {
   //State to manage columns and tasks
@@ -8,8 +8,8 @@ export default function Home() {
     { id: 3, title: "Done", tasks: [] },
   ]);
   
-  const [taskInput, setTaskInput] = useState("");
-
+  const [taskInput, setTaskInput] = React.useState("");
+  
   //Add a column
   const addColumn = () => {
     const newColumn = { id: columns.length + 1, title: "New Column", tasks: [] };
@@ -70,10 +70,6 @@ export default function Home() {
   );
 }
 
-//pages/index.js
-import { useState } from "react";
-import { gql, useQuery, useMutation } from "@apollo/client";
-
 //GraphQL Query to fetch columns and tasks
 const GET_COLUMNS = gql`
   query GetColumns {
@@ -87,64 +83,6 @@ const GET_COLUMNS = gql`
     }
   }
 `;
-
-const CREATE_TASK = gql`
-  mutation CreateTask($columnId: ID!, $taskContent: String!) {
-    createTask(columnId: $columnId, content: $taskContent) {
-      id
-      content
-    }
-  }
-`;
-
-export default function Home() {
-  //Fetch columns from GraphQL server
-  const { loading, error, data } = useQuery(GET_COLUMNS);
-  const [createTask] = useMutation(CREATE_TASK);
-  
-  const [taskInput, setTaskInput] = useState("");
-
-  const addTask = (columnId) => {
-    if (taskInput.trim() === "") return;
-    createTask({ variables: { columnId, taskContent: taskInput } });
-    setTaskInput("");
-  };
-
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
-
-  //Render columns and tasks fetched from GraphQL
-  return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
-      <header className="bg-blue-600 text-white p-4 text-center">Kanban Board</header>
-      <main className="flex p-4 space-x-4">
-        {data.columns.map((column) => (
-          <div key={column.id} className="bg-white p-4 rounded-lg shadow-lg w-1/3">
-            <h2 className="text-xl font-bold">{column.title}</h2>
-            <div className="space-y-2">
-              {column.tasks.map((task) => (
-                <div key={task.id} className="bg-gray-200 p-2 rounded-md">{task.content}</div>
-              ))}
-            </div>
-            <input
-              value={taskInput}
-              onChange={(e) => setTaskInput(e.target.value)}
-              className="border p-2 rounded w-full mt-4"
-              placeholder="Add a task"
-            />
-            <button
-              onClick={() => addTask(column.id)}
-              className="bg-blue-600 text-white p-2 rounded-full mt-2"
-            >
-              Add Task
-            </button>
-          </div>
-        ))}
-      </main>
-      <footer className="bg-blue-600 text-white p-4 text-center mt-auto">Footer content</footer>
-    </div>
-  );
-}
 
 import { useState, useEffect } from "react";
 
